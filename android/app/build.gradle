@@ -50,7 +50,9 @@ android {
     }
 
     defaultConfig {
-        applicationId "dev.shorebird.fluttercon_demo"
+        // This was supposed to be shorebird, not shorebid, but I can't
+        // change it w/o deleting the app and republishing.
+        applicationId "dev.shorebid.fluttercon_demo"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
