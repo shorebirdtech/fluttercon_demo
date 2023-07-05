@@ -476,14 +476,15 @@ class _UpdateButtonState extends State<UpdateButton> {
     switch (status) {
       case UpdateStatus.idle:
         if (_haveUpdate) {
-          Restart.restartApp;
+          return Restart.restartApp;
         } else {
           return _checkForUpdate;
         }
       case UpdateStatus.checking:
+        return null;
       case UpdateStatus.finishingCheck:
+        return null;
     }
-    return null;
   }
 
   @override
