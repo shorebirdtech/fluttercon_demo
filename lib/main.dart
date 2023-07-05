@@ -1,11 +1,13 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+import 'dart:ffi' as ffi;
 
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:restart_app/restart_app.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         ),
-        home: MyHomePage(),
+        home: const MyHomePage(),
       ),
     );
   }
@@ -60,8 +62,30 @@ class MyAppState extends ChangeNotifier {
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class ButtonOverlay extends StatelessWidget {
+  const ButtonOverlay({required this.child, required this.button, super.key});
+  final Widget child;
+  final Widget button;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        child,
+        Positioned(
+          bottom: 10,
+          right: 10,
+          child: button,
+        ),
+      ],
+    );
+  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -74,21 +98,23 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = GeneratorPage();
+        page = const GeneratorPage();
         break;
       case 1:
-        page = FavoritesPage();
+        page = const FavoritesPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
+
+    page = ButtonOverlay(button: const UpdateButton(), child: page);
 
     // The container for the current page, with its background color
     // and subtle switching animation.
     var mainArea = ColoredBox(
       color: colorScheme.surfaceVariant,
       child: AnimatedSwitcher(
-        duration: Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 200),
         child: page,
       ),
     );
@@ -104,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(child: mainArea),
                 SafeArea(
                   child: BottomNavigationBar(
-                    items: [
+                    items: const [
                       BottomNavigationBarItem(
                         icon: Icon(Icons.home),
                         label: 'Home',
@@ -130,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SafeArea(
                   child: NavigationRail(
                     extended: constraints.maxWidth >= 600,
-                    destinations: [
+                    destinations: const [
                       NavigationRailDestination(
                         icon: Icon(Icons.home),
                         label: Text('Home'),
@@ -159,6 +185,8 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class GeneratorPage extends StatelessWidget {
+  const GeneratorPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -175,13 +203,13 @@ class GeneratorPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
+          const Expanded(
             flex: 3,
             child: HistoryListView(),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           BigCard(pair: pair),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -190,18 +218,18 @@ class GeneratorPage extends StatelessWidget {
                   appState.toggleFavorite();
                 },
                 icon: Icon(icon),
-                label: Text('Like'),
+                label: const Text('Like'),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               ElevatedButton(
                 onPressed: () {
                   appState.getNext();
                 },
-                child: Text('Next'),
+                child: const Text('Next'),
               ),
             ],
           ),
-          Spacer(flex: 2),
+          const Spacer(flex: 2),
         ],
       ),
     );
@@ -228,7 +256,7 @@ class BigCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: AnimatedSize(
-          duration: Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 200),
           // Make sure that the compound word wraps correctly when the window
           // is too narrow.
           child: MergeSemantics(
@@ -252,13 +280,15 @@ class BigCard extends StatelessWidget {
 }
 
 class FavoritesPage extends StatelessWidget {
+  const FavoritesPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     var appState = context.watch<MyAppState>();
 
     if (appState.favorites.isEmpty) {
-      return Center(
+      return const Center(
         child: Text('No favorites yet.'),
       );
     }
@@ -274,7 +304,7 @@ class FavoritesPage extends StatelessWidget {
         Expanded(
           // Make better use of wide windows with a grid.
           child: GridView(
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 400,
               childAspectRatio: 400 / 80,
             ),
@@ -282,7 +312,8 @@ class FavoritesPage extends StatelessWidget {
               for (var pair in appState.favorites)
                 ListTile(
                   leading: IconButton(
-                    icon: Icon(Icons.delete_outline, semanticLabel: 'Delete'),
+                    icon: const Icon(Icons.delete_outline,
+                        semanticLabel: 'Delete'),
                     color: theme.colorScheme.primary,
                     onPressed: () {
                       appState.removeFavorite(pair);
@@ -336,7 +367,7 @@ class _HistoryListViewState extends State<HistoryListView> {
       child: AnimatedList(
         key: _key,
         reverse: true,
-        padding: EdgeInsets.only(top: 100),
+        padding: const EdgeInsets.only(top: 100),
         initialItemCount: appState.history.length,
         itemBuilder: (context, index, animation) {
           final pair = appState.history[index];
@@ -348,8 +379,8 @@ class _HistoryListViewState extends State<HistoryListView> {
                   appState.toggleFavorite(pair);
                 },
                 icon: appState.favorites.contains(pair)
-                    ? Icon(Icons.favorite, size: 12)
-                    : SizedBox(),
+                    ? const Icon(Icons.favorite, size: 12)
+                    : const SizedBox(),
                 label: Text(
                   pair.asLowerCase,
                   semanticsLabel: pair.asPascalCase,
@@ -359,6 +390,110 @@ class _HistoryListViewState extends State<HistoryListView> {
           );
         },
       ),
+    );
+  }
+}
+
+class UpdateButton extends StatefulWidget {
+  const UpdateButton({super.key});
+
+  @override
+  State<UpdateButton> createState() => _UpdateButtonState();
+}
+
+enum UpdateStatus {
+  idle,
+  checking,
+  finishingCheck,
+}
+
+class _UpdateButtonState extends State<UpdateButton> {
+  UpdateStatus status = UpdateStatus.idle;
+  late bool _haveShorebirdEngine;
+  bool _haveUpdate = false;
+  final _shorebirdCodePush = ShorebirdCodePush();
+
+  @override
+  void initState() {
+    super.initState();
+    final ffi.DynamicLibrary library = ffi.DynamicLibrary.process();
+    _haveShorebirdEngine = library.providesSymbol('shorebird_update');
+  }
+
+  Future<bool> _doUpdateCheck() async {
+    if (_haveShorebirdEngine) {
+      // Ask the Shorebird servers if there is a new patch available.
+      return _shorebirdCodePush.isNewPatchAvailableForDownload();
+    } else {
+      return Future.delayed(const Duration(seconds: 2), () => false);
+    }
+  }
+
+  Future<void> _checkForUpdate() async {
+    setState(() {
+      status = UpdateStatus.checking;
+    });
+    final isUpdateAvailable = await _doUpdateCheck();
+
+    if (!mounted) return;
+
+    if (isUpdateAvailable) {
+      await _shorebirdCodePush.downloadUpdateIfAvailable();
+    }
+    setState(() {
+      _haveUpdate = isUpdateAvailable;
+      status = UpdateStatus.finishingCheck;
+    });
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        status = UpdateStatus.idle;
+      });
+    });
+  }
+
+  Widget widgetForStatus(UpdateStatus status) {
+    switch (status) {
+      case UpdateStatus.idle:
+        if (_haveUpdate) {
+          return const Icon(Icons.restart_alt);
+        } else {
+          return const Icon(Icons.rocket);
+        }
+      case UpdateStatus.checking:
+        return const SizedBox(
+          width: 25,
+          height: 25,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+          ),
+        );
+      case UpdateStatus.finishingCheck:
+        return const Icon(Icons.thumb_up_outlined);
+    }
+  }
+
+  void Function()? actionForStatus(UpdateStatus status) {
+    switch (status) {
+      case UpdateStatus.idle:
+        if (_haveUpdate) {
+          Restart.restartApp;
+        } else {
+          return _checkForUpdate;
+        }
+      case UpdateStatus.checking:
+      case UpdateStatus.finishingCheck:
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final widget = widgetForStatus(status);
+    final action = actionForStatus(status);
+
+    return ElevatedButton(
+      onPressed: action,
+      child: widget,
     );
   }
 }
